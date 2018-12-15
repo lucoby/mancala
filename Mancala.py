@@ -17,6 +17,9 @@ class Mancala():
         self.starting_holes = starting_holes
         self.starting_stones = starting_stones
         self.reset()
+        self.player_1_holes[0] = 15
+        self.player_2_holes[0] = 15
+        self.print_board()
 
 
     def reset(self):
@@ -25,3 +28,12 @@ class Mancala():
         self.player_1_mancala = 0
         self.player_2_mancala = 0
         self.turn = 1
+
+    def print_board(self):
+        top_row = "P2   " + "".join(["%3d"%x for x in self.player_2_holes[::-1]]) + " " + "%4d"%self.player_1_mancala
+        bottom_row = "%4d"%self.player_2_mancala + " " + "".join(["%3d"%x for x in self.player_1_holes]) + "   P1"
+        print(top_row)
+        print(bottom_row)
+
+if __name__ == '__main__':
+    mancala = Mancala()
