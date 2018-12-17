@@ -87,6 +87,18 @@ class Mancala():
             self.player_2_mancala += self.player_1_holes[idx]
             self.player_1_holes[idx] = 0
 
+    def game_over(self):
+        if self.turn == 1:
+            return self.player_1_holes == [0 for i in range(self.starting_holes)]
+        else:
+            return self.player_2_holes == [0 for i in range(self.starting_holes)]
+
+    def game_over_captures(self):
+        if self.turn == 1:
+            self.player_2_mancala += sum(self.player_2_holes)
+        else:
+            self.player_1_mancala += sum(self.player_1_holes)
+
     def print_board(self):
         top_row = "P2   " + "".join(["%3d"%x for x in self.player_2_holes]) + " " + "%4d"%self.player_1_mancala
         bottom_row = "%4d"%self.player_2_mancala + " " + "".join(["%3d"%x for x in self.player_1_holes[::-1]]) + "   P1"
