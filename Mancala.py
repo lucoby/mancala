@@ -63,6 +63,8 @@ class Mancala():
                         my_board[idx] += 1
                     else:
                         opponent_board[idx] += 1
+                    if stones == 1 and fill_my_side and my_board[idx] == 1:
+                        self.capture(idx)
                     stones -= 1
                     idx -= 1
                 if idx == -1:
@@ -76,6 +78,14 @@ class Mancala():
                     idx = self.starting_holes - 1
             if not mancala:
                 self.turn = self.turn % 2 + 1
+
+    def capture(self, idx):
+        if self.turn == 1:
+            self.player_1_mancala += self.player_2_holes[idx]
+            self.player_2_holes[idx] = 0
+        else:
+            self.player_2_mancala += self.player_1_holes[idx]
+            self.player_1_holes[idx] = 0
 
     def print_board(self):
         top_row = "P2   " + "".join(["%3d"%x for x in self.player_2_holes]) + " " + "%4d"%self.player_1_mancala
