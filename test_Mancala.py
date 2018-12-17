@@ -58,3 +58,55 @@ class Test_Mancala(unittest.TestCase):
         mancala.turn = 2
         mancala.player_2_holes[2] = 3
         self.assertTrue(mancala.valid_mancala(2))
+
+    def test_apply_move_no_mancala(self):
+        mancala = Mancala(Human_Player(), Human_Player(), starting_stones=3, starting_holes=6)
+        mancala.reset()
+        mancala.apply_move(4)
+        self.assertEqual(mancala.player_1_mancala, 0)
+        self.assertEqual(mancala.player_2_mancala, 0)
+        self.assertEqual(mancala.player_1_holes, [3, 4, 4, 4, 0, 3])
+        self.assertEqual(mancala.player_2_holes, [3, 3, 3, 3, 3, 3])
+        self.assertEqual(mancala.turn, 2)
+
+    def test_apply_move_mancala(self):
+        mancala = Mancala(Human_Player(), Human_Player(), starting_stones=3, starting_holes=6)
+        mancala.reset()
+        mancala.apply_move(2)
+        self.assertEqual(mancala.player_1_mancala, 1)
+        self.assertEqual(mancala.player_2_mancala, 0)
+        self.assertEqual(mancala.player_1_holes, [4, 4, 0, 3, 3, 3])
+        self.assertEqual(mancala.player_2_holes, [3, 3, 3, 3, 3, 3])
+        self.assertEqual(mancala.turn, 1)
+
+    def test_apply_move_add_to_opponent(self):
+        mancala = Mancala(Human_Player(), Human_Player(), starting_stones=3, starting_holes=6)
+        mancala.reset()
+        mancala.apply_move(0)
+        self.assertEqual(mancala.player_1_mancala, 1)
+        self.assertEqual(mancala.player_2_mancala, 0)
+        self.assertEqual(mancala.player_1_holes, [0, 3, 3, 3, 3, 3])
+        self.assertEqual(mancala.player_2_holes, [3, 3, 3, 3, 4, 4])
+        self.assertEqual(mancala.turn, 2)
+
+    def test_apply_move_add_to_opponent_p2(self):
+        mancala = Mancala(Human_Player(), Human_Player(), starting_stones=3, starting_holes=6)
+        mancala.reset()
+        mancala.turn = 2
+        mancala.apply_move(0)
+        self.assertEqual(mancala.player_1_mancala, 0)
+        self.assertEqual(mancala.player_2_mancala, 1)
+        self.assertEqual(mancala.player_1_holes, [3, 3, 3, 3, 4, 4])
+        self.assertEqual(mancala.player_2_holes, [0, 3, 3, 3, 3, 3])
+        self.assertEqual(mancala.turn, 1)
+
+    def test_apply_move_big_move(self):
+        mancala = Mancala(Human_Player(), Human_Player(), starting_stones=3, starting_holes=6)
+        mancala.reset()
+        mancala.player_1_holes[1] = 15
+        mancala.apply_move(1)
+        self.assertEqual(mancala.player_1_mancala, 2)
+        self.assertEqual(mancala.player_2_mancala, 0)
+        self.assertEqual(mancala.player_1_holes, [5, 1, 4, 4, 4, 4])
+        self.assertEqual(mancala.player_2_holes, [4, 4, 4, 4, 4, 4])
+        self.assertEqual(mancala.turn, 1)

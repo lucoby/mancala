@@ -44,6 +44,39 @@ class Mancala():
         else:
             return (self.player_2_holes[move] - move - 1) % (2 * self.starting_holes + 1) == 0
 
+    def apply_move(self, move):
+        if self.valid_move(move):
+            mancala = self.valid_mancala(move)
+            if self.turn == 1:
+                my_board = self.player_1_holes
+                opponent_board = self.player_2_holes
+            else:
+                my_board = self.player_2_holes
+                opponent_board = self.player_1_holes
+            stones = my_board[move]
+            my_board[move] = 0
+            idx = move - 1
+            fill_my_side = True
+            while stones > 0:
+                if idx > -1:
+                    if fill_my_side:
+                        my_board[idx] += 1
+                    else:
+                        opponent_board[idx] += 1
+                    stones -= 1
+                    idx -= 1
+                if idx == -1:
+                    if stones > 0 and fill_my_side:
+                        if self.turn == 1:
+                            self.player_1_mancala += 1
+                        else:
+                            self.player_2_mancala += 1
+                        stones -= 1
+                    fill_my_side = not fill_my_side
+                    idx = self.starting_holes - 1
+            if not mancala:
+                self.turn = self.turn % 2 + 1
+
     def print_board(self):
         top_row = "P2   " + "".join(["%3d"%x for x in self.player_2_holes]) + " " + "%4d"%self.player_1_mancala
         bottom_row = "%4d"%self.player_2_mancala + " " + "".join(["%3d"%x for x in self.player_1_holes[::-1]]) + "   P1"
