@@ -16,3 +16,45 @@ class Test_Mancala(unittest.TestCase):
         self.assertEqual(mancala.player_1_mancala, 0)
         self.assertEqual(mancala.player_2_mancala, 0)
         self.assertEqual(mancala.turn, 1)
+
+    def test_valid_move_pos(self):
+        mancala = Mancala(Human_Player(), Human_Player(), starting_stones=3, starting_holes=6)
+        mancala.reset()
+        self.assertTrue(mancala.valid_move(0))
+        self.assertTrue(mancala.valid_move(1))
+        self.assertTrue(mancala.valid_move(5))
+        self.assertFalse(mancala.valid_move(-1))
+        self.assertFalse(mancala.valid_move(6))
+        self.assertFalse(mancala.valid_move(7))
+
+    def test_valid_move_zero_stones(self):
+        mancala = Mancala(Human_Player(), Human_Player(), starting_stones=3, starting_holes=6)
+        mancala.reset()
+        mancala.player_1_holes[2] = 0
+        self.assertTrue(mancala.valid_move(1))
+        self.assertTrue(mancala.valid_move(3))
+        self.assertFalse(mancala.valid_move(2))
+        mancala.turn = 2
+        self.assertTrue(mancala.valid_move(1))
+        self.assertTrue(mancala.valid_move(3))
+        self.assertTrue(mancala.valid_move(2))
+        mancala.player_2_holes[2] = 0
+        self.assertTrue(mancala.valid_move(1))
+        self.assertTrue(mancala.valid_move(3))
+        self.assertFalse(mancala.valid_move(2))
+
+    def test_mancala(self):
+        mancala = Mancala(Human_Player(), Human_Player(), starting_stones=3, starting_holes=6)
+        mancala.reset()
+        self.assertFalse(mancala.valid_mancala(0))
+        mancala.player_1_holes[0] = 1
+        self.assertTrue(mancala.valid_mancala(0))
+        mancala.player_1_holes[1] = 2
+        self.assertTrue(mancala.valid_mancala(1))
+        mancala.player_1_holes[1] = 5
+        self.assertFalse(mancala.valid_mancala(1))
+        mancala.player_1_holes[2] = 16
+        self.assertTrue(mancala.valid_mancala(2))
+        mancala.turn = 2
+        mancala.player_2_holes[2] = 3
+        self.assertTrue(mancala.valid_mancala(2))
