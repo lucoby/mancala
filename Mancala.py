@@ -1,4 +1,5 @@
 from Human_Player import Human_Player
+from Random_Player import Random_Player
 
 class Mancala():
     """
@@ -19,7 +20,7 @@ class Mancala():
         self.player_1 = player_1
         self.player_2 = player_2
         self.reset()
-        self.print_board()
+
 
     def reset(self):
         self.player_1_holes = [self.starting_stones for i in range(self.starting_holes)]
@@ -81,11 +82,11 @@ class Mancala():
 
     def capture(self, idx):
         if self.turn == 1:
-            self.player_1_mancala += self.player_2_holes[idx]
-            self.player_2_holes[idx] = 0
+            self.player_1_mancala += self.player_2_holes[self.starting_holes - idx - 1]
+            self.player_2_holes[self.starting_holes - idx - 1] = 0
         else:
-            self.player_2_mancala += self.player_1_holes[idx]
-            self.player_1_holes[idx] = 0
+            self.player_2_mancala += self.player_1_holes[self.starting_holes - idx - 1]
+            self.player_1_holes[self.starting_holes - idx - 1] = 0
 
     def game_over(self):
         if self.turn == 1:
@@ -99,6 +100,24 @@ class Mancala():
         else:
             self.player_1_mancala += sum(self.player_1_holes)
 
+    def game_loop(self):
+        while not self.game_over():
+            move = -1
+            while not self.valid_move(move):
+                print("Player {} turn".format(self.turn))
+                self.print_board()
+                if self.turn == 1:
+                    move = self.player_1.action()
+                else:
+                    move = self.player_2.action()
+            self.apply_move(move)
+        self.game_over_captures()
+        if self.player_1_mancala > self.player_2_mancala:
+            print("Player 1 wins!")
+        else:
+            print("Player 2 wins!")
+        print("{} - {}".format(self.player_1_mancala, self.player_2_mancala))
+
     def print_board(self):
         top_row = "P2   " + "".join(["%3d"%x for x in self.player_2_holes]) + " " + "%4d"%self.player_1_mancala
         bottom_row = "%4d"%self.player_2_mancala + " " + "".join(["%3d"%x for x in self.player_1_holes[::-1]]) + "   P1"
@@ -106,4 +125,7 @@ class Mancala():
         print(bottom_row)
 
 if __name__ == '__main__':
-    mancala = Mancala(Human_Player(), Human_Player())
+    number_holes = 7
+    mancala = Mancala(Human_Player(), Random_Player(number_holes), starting_holes=number_holes)
+    mancala.print_board()
+    mancala.game_loop()

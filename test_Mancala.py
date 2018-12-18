@@ -119,7 +119,7 @@ class Test_Mancala(unittest.TestCase):
         self.assertEqual(mancala.player_1_mancala, 3)
         self.assertEqual(mancala.player_2_mancala, 0)
         self.assertEqual(mancala.player_1_holes, [1, 4, 4, 0, 3, 3])
-        self.assertEqual(mancala.player_2_holes, [0, 3, 3, 3, 3, 3])
+        self.assertEqual(mancala.player_2_holes, [3, 3, 3, 3, 3, 0])
         self.assertEqual(mancala.turn, 2)
 
     def test_game_over(self):
