@@ -14,13 +14,22 @@ class Mancala():
     board you capture all stones in the opponents hole that is opposite.
     """
 
-    def __init__(self, player_1, player_2, starting_stones=4, starting_holes=7):
+    def __init__(self, player_1, player_2, starting_stones=4, starting_holes=7, verbose=False):
         self.starting_holes = starting_holes
         self.starting_stones = starting_stones
         self.player_1 = player_1
         self.player_2 = player_2
+        self.verbose = verbose
         self.reset()
 
+    def copy(self):
+        m = Mancala(self.player_1, self.player_2, starting_stones=self.starting_stones, starting_holes=self.starting_holes)
+        m.player_1_holes = [i for i in self.player_1_holes]
+        m.player_2_holes = [i for i in self.player_2_holes]
+        m.player_1_mancala = self.player_1_mancala
+        m.player_2_mancala = self.player_2_mancala
+        m.turn = self.turn
+        return m
 
     def reset(self):
         self.player_1_holes = [self.starting_stones for i in range(self.starting_holes)]
@@ -104,8 +113,9 @@ class Mancala():
         while not self.game_over():
             move = -1
             while not self.valid_move(move):
-                print("Player {} turn".format(self.turn))
-                self.print_board()
+                if self.verbose:
+                    print("Player {} turn".format(self.turn))
+                    self.print_board()
                 if self.turn == 1:
                     move = self.player_1.action()
                 else:
@@ -113,10 +123,15 @@ class Mancala():
             self.apply_move(move)
         self.game_over_captures()
         if self.player_1_mancala > self.player_2_mancala:
-            print("Player 1 wins!")
+            if self.verbose:
+                print("Player 1 wins!")
+                print("{} - {}".format(self.player_1_mancala, self.player_2_mancala))
+            return 1
         else:
-            print("Player 2 wins!")
-        print("{} - {}".format(self.player_1_mancala, self.player_2_mancala))
+            if self.verbose:
+                print("Player 2 wins!")
+                print("{} - {}".format(self.player_1_mancala, self.player_2_mancala))
+            return 2
 
     def print_board(self):
         top_row = "P2   " + "".join(["%3d"%x for x in self.player_2_holes]) + " " + "%4d"%self.player_1_mancala
@@ -126,6 +141,6 @@ class Mancala():
 
 if __name__ == '__main__':
     number_holes = 7
-    mancala = Mancala(Human_Player(), Random_Player(number_holes), starting_holes=number_holes)
+    mancala = Mancala(Human_Player(), Random_Player(number_holes), starting_holes=number_holes, verbose=True)
     mancala.print_board()
     mancala.game_loop()
