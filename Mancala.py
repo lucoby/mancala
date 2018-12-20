@@ -14,30 +14,29 @@ class Mancala():
     board you capture all stones in the opponents hole that is opposite.
     """
 
-    def __init__(self, player_1, player_2, starting_stones=4, starting_holes=7, verbose=False):
+    def __init__(self, p1, p2, starting_stones=4, starting_holes=7, verbose=False):
         self.starting_holes = starting_holes
         self.starting_stones = starting_stones
-        self.player_1 = player_1
-        self.player_2 = player_2
+        self.p1 = p1
+        self.p2 = p2
         self.verbose = verbose
         self.breadth = []
         self.reset()
 
     def copy(self):
-        m = Mancala(self.player_1, self.player_2, starting_stones=self.starting_stones, starting_holes=self.starting_holes)
-        m.player_1_holes = [i for i in self.player_1_holes]
-        m.player_2_holes = [i for i in self.player_2_holes]
-        m.player_1_mancala = self.player_1_mancala
-        m.player_2_mancala = self.player_2_mancala
+        m = Mancala(self.p1, self.p2, starting_stones=self.starting_stones, starting_holes=self.starting_holes)
+        m.p1_holes = [i for i in self.p1_holes]
+        m.p2_holes = [i for i in self.p2_holes]
+        m.p1_mancala = self.p1_mancala
+        m.p2_mancala = self.p2_mancala
         m.turn = self.turn
         return m
 
     def reset(self):
-        self.player_1_holes = [self.starting_stones for i in range(self.starting_holes)]
-        self.player_2_holes = [self.starting_stones for i in range(self.starting_holes)]
-        self.player_1_mancala = 0
-        self.player_2_mancala = 0
-        self.winner = None
+        self.p1_holes = [self.starting_stones for i in range(self.starting_holes)]
+        self.p2_holes = [self.starting_stones for i in range(self.starting_holes)]
+        self.p1_mancala = 0
+        self.p2_mancala = 0
         self.turn = 1
 
     def get_valid_moves(self):
@@ -46,28 +45,28 @@ class Mancala():
     def valid_move(self, move):
         if not 0 <= move < self.starting_holes:
             return False
-        elif self.turn == 1 and self.player_1_holes[move] == 0:
+        elif self.turn == 1 and self.p1_holes[move] == 0:
             return False
-        elif self.turn == 2 and self.player_2_holes[move] == 0:
+        elif self.turn == 2 and self.p2_holes[move] == 0:
             return False
         else:
             return True
 
     def valid_mancala(self, move):
         if self.turn == 1:
-            return (self.player_1_holes[move] - move - 1) % (2 * self.starting_holes + 1) == 0
+            return (self.p1_holes[move] - move - 1) % (2 * self.starting_holes + 1) == 0
         else:
-            return (self.player_2_holes[move] - move - 1) % (2 * self.starting_holes + 1) == 0
+            return (self.p2_holes[move] - move - 1) % (2 * self.starting_holes + 1) == 0
 
     def apply_move(self, move):
         if self.valid_move(move):
             mancala = self.valid_mancala(move)
             if self.turn == 1:
-                my_board = self.player_1_holes
-                opponent_board = self.player_2_holes
+                my_board = self.p1_holes
+                opponent_board = self.p2_holes
             else:
-                my_board = self.player_2_holes
-                opponent_board = self.player_1_holes
+                my_board = self.p2_holes
+                opponent_board = self.p1_holes
             stones = my_board[move]
             my_board[move] = 0
             idx = move - 1
@@ -85,9 +84,9 @@ class Mancala():
                 if idx == -1:
                     if stones > 0 and fill_my_side:
                         if self.turn == 1:
-                            self.player_1_mancala += 1
+                            self.p1_mancala += 1
                         else:
-                            self.player_2_mancala += 1
+                            self.p2_mancala += 1
                         stones -= 1
                     fill_my_side = not fill_my_side
                     idx = self.starting_holes - 1
@@ -96,29 +95,42 @@ class Mancala():
 
     def capture(self, idx):
         if self.turn == 1:
-            self.player_1_mancala += self.player_2_holes[self.starting_holes - idx - 1]
-            self.player_2_holes[self.starting_holes - idx - 1] = 0
+            self.p1_mancala += self.p2_holes[self.starting_holes - idx - 1]
+            self.p2_holes[self.starting_holes - idx - 1] = 0
         else:
-            self.player_2_mancala += self.player_1_holes[self.starting_holes - idx - 1]
-            self.player_1_holes[self.starting_holes - idx - 1] = 0
+            self.p2_mancala += self.p1_holes[self.starting_holes - idx - 1]
+            self.p1_holes[self.starting_holes - idx - 1] = 0
+
+    def final_score(self, player):
+        if player == self.p1:
+            return self.p1_mancala + sum(self.p1_holes)
+        elif player == self.p2:
+            return self.p2_mancala + sum(self.p2_holes)
+
 
     def is_winner(self, player):
-        return self.winner == player
+        if self.game_over():
+            return (player == self.p1 and self.final_score(self.p1) > self.final_score(self.p2)) \
+                or (player == self.p2 and self.final_score(self.p2) > self.final_score(self.p1))
 
     def is_opponent_winner(self, player):
-        return (player == self.player_1 and self.winner == self.player_2) or (player == self.player_2 and self.winner == self.player_1)
+        if self.game_over():
+            return (player == self.p1 and self.final_score(self.p2) > self.final_score(self.p1)) \
+                or (player == self.p2 and self.final_score(self.p1) > self.final_score(self.p2))
 
     def game_over(self):
         if self.turn == 1:
-            return self.player_1_holes == [0 for i in range(self.starting_holes)]
+            return self.p1_holes == [0 for i in range(self.starting_holes)]
         else:
-            return self.player_2_holes == [0 for i in range(self.starting_holes)]
+            return self.p2_holes == [0 for i in range(self.starting_holes)]
 
     def game_over_captures(self):
         if self.turn == 1:
-            self.player_2_mancala += sum(self.player_2_holes)
+            self.p2_mancala += sum(self.p2_holes)
+            self.p2_holes = [0 for i in range(self.starting_holes)]
         else:
-            self.player_1_mancala += sum(self.player_1_holes)
+            self.p1_mancala += sum(self.p1_holes)
+            self.p1_holes = [0 for i in range(self.starting_holes)]
 
     def game_loop(self):
         while not self.game_over():
@@ -129,27 +141,30 @@ class Mancala():
                     print("Player {} turn".format(self.turn))
                     self.print_board()
                 if self.turn == 1:
-                    move = self.player_1.action(self)
+                    move = self.p1.action(self)
                 else:
-                    move = self.player_2.action(self)
+                    move = self.p2.action(self)
             self.apply_move(move)
         self.game_over_captures()
-        if self.player_1_mancala > self.player_2_mancala:
+        if self.p1_mancala > self.p2_mancala:
             if self.verbose:
                 print("Player 1 wins!")
-                print("{} - {}".format(self.player_1_mancala, self.player_2_mancala))
-            self.winner = self.player_1
+                print("{} - {}".format(self.p1_mancala, self.p2_mancala))
             return 1
-        else:
+        elif self.p2_mancala > self.p1_mancala:
             if self.verbose:
                 print("Player 2 wins!")
-                print("{} - {}".format(self.player_1_mancala, self.player_2_mancala))
-            self.winner = self.player_2
+                print("{} - {}".format(self.p1_mancala, self.p2_mancala))
             return 2
+        else:
+            if self.verbose:
+                print("Draw!")
+                print("{} - {}".format(self.p1_mancala, self.p2_mancala))
+            return 0
 
     def print_board(self):
-        top_row = "P2   " + "".join(["%3d"%x for x in self.player_2_holes]) + " " + "%4d"%self.player_1_mancala
-        bottom_row = "%4d"%self.player_2_mancala + " " + "".join(["%3d"%x for x in self.player_1_holes[::-1]]) + "   P1"
+        top_row = "P2   " + "".join(["%3d"%x for x in self.p2_holes]) + " " + "%4d"%self.p1_mancala
+        bottom_row = "%4d"%self.p2_mancala + " " + "".join(["%3d"%x for x in self.p1_holes[::-1]]) + "   P1"
         print(top_row)
         print(bottom_row)
 
