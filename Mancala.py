@@ -20,6 +20,7 @@ class Mancala():
         self.player_1 = player_1
         self.player_2 = player_2
         self.verbose = verbose
+        self.breadth = []
         self.reset()
 
     def copy(self):
@@ -36,7 +37,11 @@ class Mancala():
         self.player_2_holes = [self.starting_stones for i in range(self.starting_holes)]
         self.player_1_mancala = 0
         self.player_2_mancala = 0
+        self.winner = None
         self.turn = 1
+
+    def get_valid_moves(self):
+        return [i for i in range(self.starting_holes) if self.valid_move(i)]
 
     def valid_move(self, move):
         if not 0 <= move < self.starting_holes:
@@ -97,6 +102,12 @@ class Mancala():
             self.player_2_mancala += self.player_1_holes[self.starting_holes - idx - 1]
             self.player_1_holes[self.starting_holes - idx - 1] = 0
 
+    def is_winner(self, player):
+        return self.winner == player
+
+    def is_opponent_winner(self, player):
+        return (player == self.player_1 and self.winner == self.player_2) or (player == self.player_2 and self.winner == self.player_1)
+
     def game_over(self):
         if self.turn == 1:
             return self.player_1_holes == [0 for i in range(self.starting_holes)]
@@ -112,25 +123,28 @@ class Mancala():
     def game_loop(self):
         while not self.game_over():
             move = -1
+            self.breadth.append(len(self.get_valid_moves()))
             while not self.valid_move(move):
                 if self.verbose:
                     print("Player {} turn".format(self.turn))
                     self.print_board()
                 if self.turn == 1:
-                    move = self.player_1.action()
+                    move = self.player_1.action(self)
                 else:
-                    move = self.player_2.action()
+                    move = self.player_2.action(self)
             self.apply_move(move)
         self.game_over_captures()
         if self.player_1_mancala > self.player_2_mancala:
             if self.verbose:
                 print("Player 1 wins!")
                 print("{} - {}".format(self.player_1_mancala, self.player_2_mancala))
+            self.winner = self.player_1
             return 1
         else:
             if self.verbose:
                 print("Player 2 wins!")
                 print("{} - {}".format(self.player_1_mancala, self.player_2_mancala))
+            self.winner = self.player_2
             return 2
 
     def print_board(self):

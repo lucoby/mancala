@@ -43,6 +43,12 @@ class Test_Mancala(unittest.TestCase):
         self.assertTrue(mancala.valid_move(3))
         self.assertFalse(mancala.valid_move(2))
 
+    def test_valid_moves(self):
+        mancala = Mancala(Human_Player(), Human_Player(), starting_stones=3, starting_holes=6)
+        mancala.reset()
+        mancala.player_1_holes = [1, 0, 0, 1, 1, 1]
+        self.assertEqual(mancala.get_valid_moves(), [0, 3, 4, 5])
+
     def test_mancala(self):
         mancala = Mancala(Human_Player(), Human_Player(), starting_stones=3, starting_holes=6)
         mancala.reset()
@@ -131,8 +137,25 @@ class Test_Mancala(unittest.TestCase):
         mancala.turn = 2
         self.assertFalse(mancala.game_over())
 
-    def test_game_over(self):
+    def test_game_over_captures(self):
         mancala = Mancala(Human_Player(), Human_Player(), starting_stones=3, starting_holes=6)
         mancala.reset()
         mancala.game_over_captures()
         self.assertEqual(mancala.player_2_mancala, 18)
+
+    def test_winner(self):
+        mancala = Mancala(Human_Player(), Human_Player(), starting_stones=3, starting_holes=6,verbose=True)
+        mancala.reset()
+        self.assertFalse(mancala.is_winner(mancala.player_1))
+        self.assertFalse(mancala.is_winner(mancala.player_2))
+        self.assertFalse(mancala.is_opponent_winner(mancala.player_1))
+        self.assertFalse(mancala.is_opponent_winner(mancala.player_2))
+        mancala.player_1_holes = [0, 0, 0, 0, 0, 0]
+        mancala.player_2_holes = [0, 0, 0, 0, 0, 0]
+        mancala.player_1_mancala = 42
+        foo = mancala.game_loop()
+        self.assertEqual(mancala.winner, mancala.player_1)
+        self.assertTrue(mancala.is_winner(mancala.player_1))
+        self.assertFalse(mancala.is_winner(mancala.player_2))
+        self.assertFalse(mancala.is_opponent_winner(mancala.player_1))
+        self.assertTrue(mancala.is_opponent_winner(mancala.player_2))

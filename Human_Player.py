@@ -1,5 +1,5 @@
 class Human_Player():
-    def action(self):
+    def action(self, mancala):
         print("Input an action:")
         move = input()
         return int(move)
