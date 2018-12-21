@@ -1,6 +1,8 @@
 from Mancala import Mancala
 from Random_Player import Random_Player
+from MiniMaxPlayer import MiniMaxPlayer
 import numpy as np
+import datetime as dt
 
 class Tournament_Play:
     def __init__(self, n, player_1, player_2, starting_stones=4, starting_holes=7):
@@ -18,7 +20,6 @@ class Tournament_Play:
             mancala = Mancala(self.player_1, self.player_2, starting_holes=self.starting_holes, starting_stones=self.starting_stones)
             player_1_wins += 1 if mancala.game_loop() == 1 else 0
             breadth.append(np.mean(mancala.breadth))
-            print(breadth)
             depth.append(len(mancala.breadth))
             mancala = Mancala(self.player_2, self.player_1, starting_holes=self.starting_holes, starting_stones=self.starting_stones)
             player_1_wins += 1 if mancala.game_loop() == 2 else 0
@@ -30,5 +31,9 @@ class Tournament_Play:
 
 
 if __name__ == '__main__':
-    tournament = Tournament_Play(3, Random_Player(), Random_Player())
+
+    tournament = Tournament_Play(100, MiniMaxPlayer(), Random_Player())
+    start = dt.datetime.now()
     tournament.play()
+    end = dt.datetime.now()
+    print((end - start).seconds)

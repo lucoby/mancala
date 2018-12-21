@@ -32,6 +32,11 @@ class Mancala():
         m.turn = self.turn
         return m
 
+    def forecast_move(self, move):
+        new_mancala = self.copy()
+        new_mancala.apply_move(move)
+        return new_mancala
+
     def reset(self):
         self.p1_holes = [self.starting_stones for i in range(self.starting_holes)]
         self.p2_holes = [self.starting_stones for i in range(self.starting_holes)]
@@ -94,19 +99,20 @@ class Mancala():
                 self.turn = self.turn % 2 + 1
 
     def capture(self, idx):
-        if self.turn == 1:
-            self.p1_mancala += self.p2_holes[self.starting_holes - idx - 1]
+        if self.turn == 1 and self.p2_holes[self.starting_holes - idx - 1] > 0:
+            self.p1_mancala += self.p2_holes[self.starting_holes - idx - 1] + 1
             self.p2_holes[self.starting_holes - idx - 1] = 0
-        else:
-            self.p2_mancala += self.p1_holes[self.starting_holes - idx - 1]
+            self.p1_holes[idx] = 0
+        elif self.turn == 2 and self.p1_holes[self.starting_holes - idx - 1] > 0:
+            self.p2_mancala += self.p1_holes[self.starting_holes - idx - 1] + 1
             self.p1_holes[self.starting_holes - idx - 1] = 0
+            self.p2_holes[idx] = 0
 
     def final_score(self, player):
         if player == self.p1:
             return self.p1_mancala + sum(self.p1_holes)
         elif player == self.p2:
             return self.p2_mancala + sum(self.p2_holes)
-
 
     def is_winner(self, player):
         if self.game_over():
@@ -138,12 +144,14 @@ class Mancala():
             self.breadth.append(len(self.get_valid_moves()))
             while not self.valid_move(move):
                 if self.verbose:
+                    print()
                     print("Player {} turn".format(self.turn))
                     self.print_board()
                 if self.turn == 1:
                     move = self.p1.action(self)
                 else:
                     move = self.p2.action(self)
+            print("Player {} played {}".format(self.turn, move + 1))
             self.apply_move(move)
         self.game_over_captures()
         if self.p1_mancala > self.p2_mancala:
@@ -170,6 +178,6 @@ class Mancala():
 
 if __name__ == '__main__':
     number_holes = 7
-    mancala = Mancala(Human_Player(), Random_Player(number_holes), starting_holes=number_holes, verbose=True)
+    mancala = Mancala(MiniMaxPlayer(), Random_Player(number_holes), starting_holes=number_holes, verbose=True)
     mancala.print_board()
     mancala.game_loop()
