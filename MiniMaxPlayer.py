@@ -1,7 +1,7 @@
 from Mancala import Mancala
 
 class MiniMaxPlayer():
-    def __init__(self, search_depth=8):
+    def __init__(self, search_depth=4):
         self.search_depth = search_depth
 
     def action(self, game):
@@ -19,12 +19,12 @@ class MiniMaxPlayer():
             return game.p2_mancala - game.p1_mancala
 
     def minimax(self, game, depth=4, maximizing_player=True):
-        if depth == 0 or game.is_opponent_winner(self) or game.is_winner(self):
+        if depth == 0 or game.game_over():
             return 0, self.utility(game)
         turn = game.turn
         if maximizing_player:
             best_val = float("-inf")
-            best_move = 0
+            best_move = game.get_valid_moves()[0]
             for m in game.get_valid_moves():
                 forecast_board = game.forecast_move(m)
                 forecast_move, forecast_score = self.minimax(forecast_board, depth - 1, turn == forecast_board.turn)
@@ -34,7 +34,7 @@ class MiniMaxPlayer():
             return best_move, best_val
         else:
             best_val = float("inf")
-            best_move = 0
+            best_move = game.get_valid_moves()[0]
             for m in game.get_valid_moves():
                 forecast_board = game.forecast_move(m)
                 forecast_move, forecast_score = self.minimax(forecast_board, depth - 1, turn != forecast_board.turn)

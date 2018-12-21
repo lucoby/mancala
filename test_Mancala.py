@@ -122,9 +122,9 @@ class Test_Mancala(unittest.TestCase):
         mancala.reset()
         mancala.p1_holes[0] = 0
         mancala.apply_move(3)
-        self.assertEqual(mancala.p1_mancala, 3)
+        self.assertEqual(mancala.p1_mancala, 4)
         self.assertEqual(mancala.p2_mancala, 0)
-        self.assertEqual(mancala.p1_holes, [1, 4, 4, 0, 3, 3])
+        self.assertEqual(mancala.p1_holes, [0, 4, 4, 0, 3, 3])
         self.assertEqual(mancala.p2_holes, [3, 3, 3, 3, 3, 0])
         self.assertEqual(mancala.turn, 2)
 

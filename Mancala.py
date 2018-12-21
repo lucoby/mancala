@@ -151,7 +151,8 @@ class Mancala():
                     move = self.p1.action(self)
                 else:
                     move = self.p2.action(self)
-            print("Player {} played {}".format(self.turn, move + 1))
+            if self.verbose:
+                print("Player {} played {}".format(self.turn, move + 1))
             self.apply_move(move)
         self.game_over_captures()
         if self.p1_mancala > self.p2_mancala:
@@ -177,7 +178,7 @@ class Mancala():
         print(bottom_row)
 
 if __name__ == '__main__':
-    number_holes = 7
+    number_holes = 6
     mancala = Mancala(MiniMaxPlayer(), Random_Player(number_holes), starting_holes=number_holes, verbose=True)
     mancala.print_board()
     mancala.game_loop()
